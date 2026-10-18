@@ -11,7 +11,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "Animation/AnimInstance.h"
+#include "Animation/AnimSequenceBase.h"
 #include "PhysicsEngine/PhysicsAsset.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Kismet/GameplayStatics.h"
 
 namespace
@@ -79,6 +81,25 @@ void AZMZombie::SetupVisuals()
 		}
 		const float Scale = FMath::FRandRange(0.94f, 1.06f);
 		GetMesh()->SetRelativeScale3D(FVector(Scale));
+
+		// Grime the mannequin: sickly, varied skin and no metallic sheen. Params exist on the template's
+		// MI_Manny materials; on other meshes these calls are harmless no-ops.
+		const FLinearColor Skins[] = { FLinearColor(0.16f, 0.19f, 0.12f), FLinearColor(0.2f, 0.17f, 0.12f), FLinearColor(0.13f, 0.14f, 0.13f), FLinearColor(0.22f, 0.21f, 0.16f) };
+		const FLinearColor Skin = Skins[FMath::RandRange(0, UE_ARRAY_COUNT(Skins) - 1)] * FMath::FRandRange(0.8f, 1.1f);
+		for (int32 i = 0; i < GetMesh()->GetNumMaterials(); ++i)
+		{
+			if (UMaterialInstanceDynamic* MID = GetMesh()->CreateDynamicMaterialInstance(i))
+			{
+				MID->SetVectorParameterValue(TEXT("Paint Tint"), Skin);
+				MID->SetScalarParameterValue(TEXT("MetalPaintMetallic"), 0.f);
+				MID->SetScalarParameterValue(TEXT("MetalPaintRoughness"), 0.9f);
+				// Hide the template's chest logo (not our branding).
+				MID->SetVectorParameterValue(TEXT("LogoTint"), FLinearColor::Black);
+				MID->SetScalarParameterValue(TEXT("LogoScale"), 0.f);
+				MID->SetScalarParameterValue(TEXT("EmissivePower"), 0.f);
+			}
+		}
+		AttackAnim = Settings->ZombieAttackAnim.IsNull() ? nullptr : Settings->ZombieAttackAnim.LoadSynchronous();
 		GreyboxRoot->SetVisibility(false, true);
 		return;
 	}
@@ -245,6 +266,12 @@ void AZMZombie::UpdateAttack(float DeltaSeconds, AZMCharacter* Target)
 		{
 			AttackWindup = 0.f;
 			ZM::PlayWorldSound(this, "SFX_Zombie_Attack", GetActorLocation(), 1.f, FMath::FRandRange(0.9f, 1.1f));
+			UAnimInstance* Anim = bUsingSkeletalMesh ? GetMesh()->GetAnimInstance() : nullptr;
+			if (Anim && AttackAnim)
+			{
+				// Needs a DefaultSlot in the anim graph; silently does nothing otherwise.
+				Anim->PlaySlotAnimationAsDynamicMontage(AttackAnim, TEXT("DefaultSlot"), 0.1f, 0.2f, 1.25f);
+			}
 		}
 		return;
 	}

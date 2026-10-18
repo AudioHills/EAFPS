@@ -70,6 +70,8 @@ def configure_zombie_assets():
     abp = find_asset("AnimBlueprint", [r"ABP_Unarmed", r"ABP_Manny", r"ABP_.*"])
     mesh_path = f"{mesh.package_name}.{mesh.asset_name}" if mesh else ""
     abp_path = f"{abp.package_name}.{abp.asset_name}_C" if abp else ""
+    attack = find_asset("AnimSequence", [r"MM_Attack_01", r"MM_Attack_.*"])
+    attack_path = f"{attack.package_name}.{attack.asset_name}" if attack else ""
     log(f"Zombie mesh: {mesh_path or '(none, greybox)'}")
     log(f"Zombie anim: {abp_path or '(none)'}")
 
@@ -88,6 +90,7 @@ def configure_zombie_assets():
 
     text = set_key(text, "ZombieMesh", mesh_path)
     text = set_key(text, "ZombieAnimClass", abp_path)
+    text = set_key(text, "ZombieAttackAnim", attack_path)
     with open(ini, "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
     log("Updated Config/DefaultGame.ini")
@@ -157,8 +160,12 @@ def create_map():
     settings = world.get_world_settings()
     settings.set_editor_property("force_no_precomputed_lighting", True)
 
+    # Build once so the RecastNavMesh actor is saved in the map (the crowd manager needs it at startup).
+    # The arena itself is spawned at runtime, so runtime generation rebuilds the tiles.
+    unreal.SystemLibrary.execute_console_command(world, "RebuildNavigation")
     level_subsystem.save_current_level()
-    log("Map saved")
+    has_nav = any(isinstance(a, unreal.RecastNavMesh) for a in actor_subsystem.get_all_level_actors())
+    log(f"Map saved (RecastNavMesh present: {has_nav})")
 
 
 def main():

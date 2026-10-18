@@ -19,7 +19,8 @@ public:
 	/** Prompt shown on the HUD, e.g. "Press F to buy Vandal SMG [Cost: 1000]". Empty = not usable now. */
 	virtual FText GetPrompt(const AZMCharacter* User) const { return FText::GetEmpty(); }
 	virtual void Interact(AZMCharacter* User) {}
-	virtual FVector GetInteractLocation() const { return GetActorLocation(); }
+	/** Closest point of this object to the viewer, so wide doors and floor-standing machines work from any angle. */
+	virtual FVector GetInteractLocation(const FVector& From) const;
 
 	static FText CostPrompt(const FText& Action, int32 Cost);
 

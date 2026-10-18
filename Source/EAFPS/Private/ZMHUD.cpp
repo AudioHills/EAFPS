@@ -186,12 +186,12 @@ void AZMHUD::DrawRound(AZMGameMode* GM, float Scale)
 
 	const float Left = 60.f * Scale;
 	const float Bottom = Canvas->ClipY - 50.f * Scale;
-	const float Height = 105.f * Scale;
+	const float Height = 120.f * Scale;
 
 	if (Round <= 5)
 	{
-		const float Spacing = 26.f * Scale;
-		const float Th = 9.f * Scale;
+		const float Spacing = 30.f * Scale;
+		const float Th = 12.f * Scale;
 		for (int32 i = 0; i < FMath::Min(Round, 4); ++i)
 		{
 			// Hand-drawn look: slight lean and uneven length.

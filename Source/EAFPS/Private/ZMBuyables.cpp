@@ -162,7 +162,7 @@ AZMPerkMachine::AZMPerkMachine()
 	Glow->SetAttenuationRadius(420.f);
 	Glow->SetCastShadows(false);
 
-	Label = MakeLabel(TEXT("Label"), FVector(39.f, 0.f, 212.f), FRotator::ZeroRotator, 13.f, FColor::White);
+	Label = MakeLabel(TEXT("Label"), FVector(39.f, 0.f, 212.f), FRotator::ZeroRotator, 17.f, FColor::White);
 }
 
 void AZMPerkMachine::OnConstruction(const FTransform& Transform)
@@ -172,7 +172,7 @@ void AZMPerkMachine::OnConstruction(const FTransform& Transform)
 	Body->SetStaticMesh(ZM::CubeMesh());
 	Body->SetMaterial(0, ZM::MakeTintedMaterial(this, C * 0.35f));
 	Sign->SetStaticMesh(ZM::CubeMesh());
-	Sign->SetMaterial(0, ZM::MakeTintedMaterial(this, C));
+	Sign->SetMaterial(0, ZM::MakeTintedMaterial(this, C * 0.45f));
 	Glow->SetLightColor(C);
 	Label->SetText(ZM::PerkName(Perk));
 }
@@ -248,10 +248,10 @@ AZMMysteryBox::AZMMysteryBox()
 
 	Beam = CreateDefaultSubobject<UPointLightComponent>(TEXT("Beam"));
 	Beam->SetupAttachment(Root);
-	Beam->SetRelativeLocation(FVector(0.f, 0.f, 140.f));
+	Beam->SetRelativeLocation(FVector(70.f, 0.f, 230.f));
 	Beam->SetLightColor(FLinearColor(0.35f, 0.6f, 1.f));
-	Beam->SetAttenuationRadius(600.f);
-	Beam->SetIntensity(2500.f);
+	Beam->SetAttenuationRadius(450.f);
+	Beam->SetIntensity(1200.f);
 	Beam->SetCastShadows(false);
 }
 
@@ -338,14 +338,14 @@ void AZMMysteryBox::Tick(float DeltaSeconds)
 	switch (State)
 	{
 	case EState::Idle:
-		Beam->SetIntensity(2500.f + 600.f * FMath::Sin(GetWorld()->GetTimeSeconds() * 2.f));
+		Beam->SetIntensity(1200.f + 300.f * FMath::Sin(GetWorld()->GetTimeSeconds() * 2.f));
 		break;
 
 	case EState::Rolling:
 	{
 		LidOpen = FMath::Clamp(StateTime / 0.4f, 0.f, 1.f);
 		Rise = FMath::Clamp(StateTime / BoxRollTime, 0.f, 1.f);
-		Beam->SetIntensity(14000.f);
+		Beam->SetIntensity(4000.f);
 		NextCycle -= DeltaSeconds;
 		if (NextCycle <= 0.f)
 		{
@@ -369,7 +369,7 @@ void AZMMysteryBox::Tick(float DeltaSeconds)
 		LidOpen = 1.f;
 		// Sinks back into the box during the last few seconds.
 		Rise = 1.f - FMath::Clamp((StateTime - (BoxOfferTime - 3.f)) / 3.f, 0.f, 1.f);
-		Beam->SetIntensity(14000.f);
+		Beam->SetIntensity(4000.f);
 		if (StateTime >= BoxOfferTime || !Buyer.IsValid())
 		{
 			ShowWeapon(NAME_None);

@@ -19,6 +19,12 @@ FText AZMInteractable::CostPrompt(const FText& Action, int32 Cost)
 	return FText::Format(LOCTEXT("CostPrompt", "Press F to {0} [Cost: {1}]"), Action, FText::AsNumber(Cost));
 }
 
+FVector AZMInteractable::GetInteractLocation(const FVector& From) const
+{
+	const FBox Bounds = GetComponentsBoundingBox(true);
+	return Bounds.IsValid ? Bounds.GetClosestPointTo(From) : GetActorLocation();
+}
+
 bool AZMInteractable::TryPurchase(AZMCharacter* User, int32 Cost) const
 {
 	AZMPlayerState* PS = User ? User->GetPlayerState<AZMPlayerState>() : nullptr;

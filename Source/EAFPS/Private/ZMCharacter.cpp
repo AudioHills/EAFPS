@@ -726,7 +726,7 @@ void AZMCharacter::UpdateViewModel(float DeltaSeconds)
 	const float AdsEase = AdsAlpha * AdsAlpha * (3.f - 2.f * AdsAlpha);
 	const float HipW = 1.f - AdsEase;
 
-	FVector Loc = FMath::Lerp(S.HipOffset, S.GetAdsOffset(), AdsEase);
+	FVector Loc = FMath::Lerp(S.GetHipOffset(), S.GetAdsOffset(), AdsEase);
 	FRotator Rot = FRotator::ZeroRotator;
 
 	// Sway: viewmodel lags behind look input.
@@ -841,7 +841,7 @@ void AZMCharacter::UpdateInteraction()
 	float BestScore = 0.f;
 	for (TActorIterator<AZMInteractable> It(GetWorld()); It; ++It)
 	{
-		const FVector To = It->GetInteractLocation() - Eye;
+		const FVector To = It->GetInteractLocation(Eye) - Eye;
 		const float Dist = To.Size();
 		if (Dist > InteractRange) continue;
 		const float Dot = FVector::DotProduct(To / FMath::Max(Dist, 1.f), Fwd);

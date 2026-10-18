@@ -23,17 +23,26 @@ protected:
 	 *   -ZMShots=8,20,45   screenshots (with HUD) at those times, to Saved/Screenshots
 	 *   -ZMQuitAt=60       quit after N seconds
 	 *   -ZMBot             aim at the nearest zombie, fire, reload, back away
-	 *   -ZMView=x,y,z,pitch,yaw   place the player for a static shot
+	 *   -ZMView=x,y,z,pitch,yaw/...   place the player before each screenshot
+	 *   -ZMSelfTest        scripted run through doors, wall buy, perk, box, power-ups, game over, restart
 	 */
 	void TickDevAutomation(float DeltaSeconds);
 	void TickBot(AZMCharacter* ZMPlayer, float DeltaSeconds);
+	void BuildSelfTest();
+	void TickSelfTest(AZMCharacter* ZMPlayer);
+	void TestLog(const FString& Msg) const;
+
+	struct FTestStep { float Time; TFunction<void(AZMCharacter*)> Run; };
+	TArray<FTestStep> TestSteps;
+	int32 NextTestStep = 0;
 
 	TArray<float> ShotTimes;
 	int32 NextShot = 0;
+	int32 RunIndex = 0;
 	float QuitAt = -1.f;
 	float DevTime = 0.f;
 	bool bBot = false;
-	bool bViewApplied = false;
+	int32 AppliedView = -1;
 	FString ViewSpec;
 	bool bBotFiring = false;
 #endif

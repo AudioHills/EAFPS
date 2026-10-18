@@ -158,8 +158,11 @@ void AZMArenaBuilder::Atmosphere()
 	FPostProcessSettings& S = PP->Settings;
 	S.bOverride_AutoExposureMethod = true;
 	S.AutoExposureMethod = EAutoExposureMethod::AEM_Manual;
+	// Exposure from the bias alone, not from physical camera settings (ISO 100 f/4 is pitch black at night).
+	S.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
+	S.AutoExposureApplyPhysicalCameraExposure = false;
 	S.bOverride_AutoExposureBias = true;
-	S.AutoExposureBias = 0.f;
+	S.AutoExposureBias = 1.f;
 	S.bOverride_VignetteIntensity = true;
 	S.VignetteIntensity = 0.6f;
 	S.bOverride_FilmGrainIntensity = true;

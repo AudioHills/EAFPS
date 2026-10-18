@@ -83,9 +83,15 @@ struct FZMWeaponStats
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FVector HipOffset = FVector(28.f, 12.f, -14.f);
 	// Greybox body size (length, width, height) for the placeholder model.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FVector BodySize = FVector(40.f, 4.f, 7.f);
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FLinearColor Tint = FLinearColor(0.05f, 0.05f, 0.05f);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FLinearColor Tint = FLinearColor(0.09f, 0.09f, 0.095f);
 
 	float GetFireInterval() const { return 60.f / FMath::Max(RoundsPerMinute, 1.f); }
+	/** Hip position, pushed forward for long guns so the stock never sits against the camera. */
+	FVector GetHipOffset() const
+	{
+		const float RearExtent = (Class == EZMWeaponClass::Pistol ? 0.3f : 0.57f) * BodySize.X;
+		return FVector(FMath::Max(HipOffset.X, RearExtent + 16.f), HipOffset.Y, HipOffset.Z);
+	}
 	/** Height of the sight posts above the model origin. */
 	float GetSightHeight() const { return BodySize.Z * 0.5f + 1.6f; }
 	/** Model origin offset from the camera when fully aimed. */

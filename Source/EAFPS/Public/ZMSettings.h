@@ -6,6 +6,7 @@
 
 class USkeletalMesh;
 class UAnimInstance;
+class UAnimSequenceBase;
 
 /** Project Settings > Game > Zombies. Asset hookups that the code falls back on gracefully. */
 UCLASS(Config = Game, DefaultConfig, meta = (DisplayName = "Zombies"))
@@ -21,6 +22,10 @@ public:
 	/** Locomotion anim blueprint compatible with ZombieMesh. */
 	UPROPERTY(Config, EditAnywhere, Category = "Zombie")
 	TSoftClassPtr<UAnimInstance> ZombieAnimClass;
+
+	/** Played in the anim graph's DefaultSlot when a zombie swings. */
+	UPROPERTY(Config, EditAnywhere, Category = "Zombie")
+	TSoftObjectPtr<UAnimSequenceBase> ZombieAttackAnim;
 
 	virtual FName GetCategoryName() const override { return TEXT("Game"); }
 };

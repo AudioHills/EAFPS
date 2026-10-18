@@ -13,6 +13,7 @@
 #include "InputModifiers.h"
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
+#include "Misc/CommandLine.h"
 
 AZMCharacter::AZMCharacter()
 {
@@ -496,6 +497,10 @@ void AZMCharacter::ReceiveZombieHit(float Damage, const FVector& FromLocation)
 	if (bDowned) return;
 	AZMGameMode* GM = GetWorld()->GetAuthGameMode<AZMGameMode>();
 	if (GM && GM->GetPhase() == EZMMatchPhase::GameOver) return;
+#if !UE_BUILD_SHIPPING
+	static const bool bGodMode = FParse::Param(FCommandLine::Get(), TEXT("ZMGod"));
+	if (bGodMode) return;
+#endif
 
 	Health -= Damage;
 	TimeSinceDamage = 0.f;

@@ -65,6 +65,8 @@ public:
 	int32 GetMaxWeaponSlots() const { return 2; }
 
 protected:
+	friend class AZMPlayerController; // dev playtest bot drives input directly
+
 	void BuildInput();
 
 	void Input_Move(const FInputActionValue& Value);

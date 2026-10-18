@@ -9,6 +9,7 @@
 #include "ZMArenaBuilder.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/CommandLine.h"
 
 #define LOCTEXT_NAMESPACE "ZM"
 
@@ -60,11 +61,17 @@ void AZMGameMode::StartPlay()
 		}
 	}
 
+	int32 StartPoints = ZM::StartingPoints;
+#if !UE_BUILD_SHIPPING
+	// Playtest overrides: -ZMPoints=50000 -ZMRound=10
+	FParse::Value(FCommandLine::Get(), TEXT("ZMPoints="), StartPoints);
+	FParse::Value(FCommandLine::Get(), TEXT("ZMRound="), DevStartRound);
+#endif
 	for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
 	{
 		if (AZMPlayerState* PS = It->Get() ? It->Get()->GetPlayerState<AZMPlayerState>() : nullptr)
 		{
-			PS->ResetForMatch(ZM::StartingPoints);
+			PS->ResetForMatch(StartPoints);
 		}
 	}
 
@@ -89,7 +96,7 @@ void AZMGameMode::Tick(float DeltaSeconds)
 	switch (Phase)
 	{
 	case EZMMatchPhase::Intro:
-		if (PhaseTime >= IntroTime) StartRound(1);
+		if (PhaseTime >= IntroTime) StartRound(FMath::Max(DevStartRound, 1));
 		break;
 
 	case EZMMatchPhase::InRound:

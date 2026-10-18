@@ -60,6 +60,7 @@ protected:
 	float PhaseTime = 0.f;
 	int32 Round = 0;
 	int32 BestRound = 0;
+	int32 DevStartRound = 1;
 	int32 ZombiesToSpawn = 0;
 	float SpawnTimer = 0.f;
 	float InstaKillTime = 0.f;

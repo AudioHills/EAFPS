@@ -8,3 +8,6 @@ DerivedDataCache/
 *.opendb
 Plugins/*/Binaries/
 Plugins/*/Intermediate/
+
+# Copied from the engine templates by Scripts/Setup.py
+Content/Characters/

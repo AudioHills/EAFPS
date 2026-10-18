@@ -42,7 +42,7 @@ TODO, in order:
 3. `Scripts/Setup.py` (run in editor): create `/Game/Maps/Zombies_Arena` (empty + large NavMeshBoundsVolume + PlayerStart),
    import `SourceAssets/Audio/*.wav` to `/Game/Audio`, find mannequin mesh/ABP and write paths into DefaultGame.ini.
    Mannequin comes from the Third Person template content (Engine `Templates/TP_ThirdPerson`), copy it into Content.
-4. `Tools/gen_sfx.py` — synthesize placeholder WAVs (names referenced in code: SFX_*_Fire, SFX_Reload_Out/In,
+4. `Tools/gen_sfx.py` — standard library only (wave/math/random, no numpy; PC has Python 3.15) — synthesize placeholder WAVs (names referenced in code: SFX_*_Fire, SFX_Reload_Out/In,
    SFX_Dry_Fire, SFX_Hit_Marker/Kill/Head, SFX_Impact, SFX_Knife_Swing/Hit, SFX_Player_Hurt/Down, SFX_Slide, SFX_Land,
    SFX_Weapon_Raise, SFX_Low_Ammo, SFX_Zombie_Groan/Attack/Death, SFX_Round_Start/End, SFX_Purchase, SFX_PowerUp_*, SFX_Game_Over).
 5. Playtest loop: launch, screenshot, fix. Then art pass with CC0 assets (Poly Haven textures/HDRIs, Quaternius zombies,

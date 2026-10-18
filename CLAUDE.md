@@ -1,16 +1,18 @@
-# EAFPS — round-based zombies FPS (Unreal Engine 5.5, C++)
+# EAFPS — round-based zombies FPS (Unreal Engine 5.x, C++)
 
 Goal: a classic COD-Zombies-style base game (feel, pacing, HUD, economy) that we later make unique.
 Original names/art only — no COD trademarks, logos, ripped assets or sounds.
 
 ## Machine
-Windows, Ryzen 7800X3D, RTX 4080 Super, 32 GB RAM. UE 5.5 from the Epic Launcher, VS 2022.
+Windows, Ryzen 7800X3D, RTX 4080 Super, 32 GB RAM, VS 2022. The installed engine is newer than 5.5 (user reported "5.8.8").
+First step on the PC: find the installed engine folder under `C:\Program Files\Epic Games\`, set `EngineAssociation`
+in EAFPS.uproject to that version (e.g. "5.8"), and fix any API deprecations the newer engine reports.
 Repo should live at a short path (e.g. `C:\Dev\EAFPS`), not OneDrive.
 
 ## Build / run (keep output filtered — UE logs are huge, only read errors)
 - Build editor target:
   `"<UE>\Engine\Build\BatchFiles\Build.bat" EAFPSEditor Win64 Development -Project="C:\Dev\EAFPS\EAFPS.uproject" -WaitMutex 2>&1 | findstr /R /C:"error" /C:"warning C" /C:"Result:"`
-  (`<UE>` is usually `C:\Program Files\Epic Games\UE_5.5`)
+  (`<UE>` is the installed engine folder, e.g. `C:\Program Files\Epic Games\UE_5.8`)
 - Run game without the editor UI: `"<UE>\Engine\Binaries\Win64\UnrealEditor.exe" C:\Dev\EAFPS\EAFPS.uproject -game -windowed -ResX=1600 -ResY=900 -log`
 - Logs: `Saved\Logs\EAFPS.log`. Grep for `Error`, `EAFPS`, `LogScript`.
 - Screenshots for critique: console command `HighResShot 1920x1080`, written to `Saved\Screenshots\`.

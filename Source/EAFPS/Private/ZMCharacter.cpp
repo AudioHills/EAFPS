@@ -317,7 +317,6 @@ void AZMCharacter::Input_Reload()
 
 void AZMCharacter::Input_Interact()
 {
-	if (bDowned) return;
 	if (AZMGameMode* GM = GetWorld()->GetAuthGameMode<AZMGameMode>())
 	{
 		if (GM->GetPhase() == EZMMatchPhase::GameOver)
@@ -326,6 +325,7 @@ void AZMCharacter::Input_Interact()
 			return;
 		}
 	}
+	if (bDowned) return;
 	if (FocusedInteractable)
 	{
 		FocusedInteractable->Interact(this);

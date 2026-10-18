@@ -9,7 +9,9 @@ public class EAFPS : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
-			"AIModule", "NavigationSystem", "DeveloperSettings"
+			"AIModule", "NavigationSystem", "DeveloperSettings", "SlateCore"
 		});
+
+		PrivateDependencyModuleNames.AddRange(new string[] { "Slate" });
 	}
 }

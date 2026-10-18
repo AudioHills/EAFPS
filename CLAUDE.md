@@ -4,9 +4,9 @@ Goal: a classic COD-Zombies-style base game (feel, pacing, HUD, economy) that we
 Original names/art only — no COD trademarks, logos, ripped assets or sounds.
 
 ## Machine
-Windows, Ryzen 7800X3D, RTX 4080 Super, 32 GB RAM, VS 2022. The installed engine is newer than 5.5 (user reported "5.8.8").
-First step on the PC: find the installed engine folder under `C:\Program Files\Epic Games\`, set `EngineAssociation`
-in EAFPS.uproject to that version (e.g. "5.8"), and fix any API deprecations the newer engine reports.
+Windows, Ryzen 7800X3D, RTX 4080 Super, 32 GB RAM, VS 2022. The installed engine is newer than 5.5 (5.8.3).
+First step on the PC: find the installed engine folder under `C:\Program Files\Epic Games\`, `EngineAssociation`
+in EAFPS.uproject is already "5.8"; fix any API deprecations the newer engine reports.
 Repo should live at a short path (e.g. `C:\Dev\EAFPS`), not OneDrive.
 
 ## Build / run (keep output filtered — UE logs are huge, only read errors)

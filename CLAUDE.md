@@ -4,18 +4,24 @@ Goal: a classic COD-Zombies-style base game (feel, pacing, HUD, economy) that we
 Original names/art only — no COD trademarks, logos, ripped assets or sounds.
 
 ## Machine
-Windows, Ryzen 7800X3D, RTX 4080 Super, 32 GB RAM, Visual Studio Community 2026. The installed engine is newer than 5.5 (5.8.3).
-First step on the PC: find the installed engine folder under `C:\Program Files\Epic Games\`, `EngineAssociation`
-in EAFPS.uproject is already "5.8"; fix any API deprecations the newer engine reports.
-Repo should live at a short path (e.g. `C:\Dev\EAFPS`), not OneDrive.
+Windows, Ryzen 7800X3D, RTX 4080 Super, 32 GB RAM, Visual Studio Community 2026 (MSVC 14.51), Python 3.15.
+Engine: UE 5.8.3 at `E:\UE_5.8` (registered under HKCU\Software\Epic Games\Unreal Engine\Builds; not in Program Files).
+Repo: `C:\Dev\EAFPS`. Git has no GitHub credentials on this PC yet — pushing needs an interactive sign-in.
 
 ## Build / run (keep output filtered — UE logs are huge, only read errors)
-- Build editor target:
-  `"<UE>\Engine\Build\BatchFiles\Build.bat" EAFPSEditor Win64 Development -Project="C:\Dev\EAFPS\EAFPS.uproject" -WaitMutex 2>&1 | findstr /R /C:"error" /C:"warning C" /C:"Result:"`
-  (`<UE>` is the installed engine folder, e.g. `C:\Program Files\Epic Games\UE_5.8`)
-- Run game without the editor UI: `"<UE>\Engine\Binaries\Win64\UnrealEditor.exe" C:\Dev\EAFPS\EAFPS.uproject -game -windowed -ResX=1600 -ResY=900 -log`
-- Logs: `Saved\Logs\EAFPS.log`. Grep for `Error`, `EAFPS`, `LogScript`.
-- Screenshots for critique: console command `HighResShot 1920x1080`, written to `Saved\Screenshots\`.
+- Build editor target (fails while any editor with Live Coding is open — close it first):
+  `"E:\UE_5.8\Engine\Build\BatchFiles\Build.bat" EAFPSEditor Win64 Development -Project="C:\Dev\EAFPS\EAFPS.uproject" -WaitMutex`
+  Filter to lines containing `C:\Dev\EAFPS` plus `Result:` — engine headers emit hundreds of C4996 deprecation warnings.
+- Run game without the editor UI: `"E:\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe" C:\Dev\EAFPS\EAFPS.uproject -game -windowed -ResX=1600 -ResY=900 -log`
+- Logs: `Saved\Logs\EAFPS.log`. Grep for `Error`, `EAFPS`, `LogScript`. One `LogCrowdFollowing: Unable to find
+  RecastNavMesh` warning at startup is benign (the crowd manager picks the navmesh up when it registers).
+- Setup (idempotent, headless): `UnrealEditor.exe C:\Dev\EAFPS\EAFPS.uproject -ExecutePythonScript="C:/Dev/EAFPS/Scripts/Setup.py" -ZMSetupQuit`
+  After regenerating sounds with `python Tools/gen_sfx.py`, add `-ZMReimportAudio`.
+- Playtest automation (non-shipping, append to the -game command line):
+  `-ZMShots=5,20,40` screenshots with HUD to `Saved\Screenshots\WindowsEditor\ZM_<t>.png` · `-ZMQuitAt=45` ·
+  `-ZMBot` aim/fire/reload bot · `-ZMGod` · `-ZMRound=9` · `-ZMPoints=20000` ·
+  `-ZMView=x,y,z,pitch,yaw/...` camera per screenshot · `-ZMSelfTest` scripted doors/wall buy/perk/box/power-ups/
+  game over/restart (logs `EAFPS TEST:` lines) · `-ExecCmds=DisableAllScreenMessages` hides "Preparing shaders".
 
 ## Architecture (Source/EAFPS)
 Everything works with zero imported assets (engine basic shapes + BasicShapeMaterial "Color" param),
@@ -33,20 +39,17 @@ then upgrades when real assets are hooked up via `UZMSettings` (Project Settings
 - `ZMArenaBuilder` — builds the default greybox map + lighting/fog/post at runtime if the level has no spawn points,
   so an empty level with a NavMeshBoundsVolume is enough to play.
 
-## Status (handoff from cloud session — nothing has been compiled yet)
-Written: uproject, Config/*, Build/Target files, ZMTypes, ZMSettings, ZMTransientFX, ZMWeapon, ZMCharacter, all headers.
-TODO, in order:
-1. Write missing .cpp: ZMZombie, ZMZombieAIController, ZMGameMode, ZMPlayerState, ZMHUD, ZMPlayerController,
-   ZMInteractable, ZMBuyables, ZMPowerUp, ZMSpawnPoint, ZMArenaBuilder.
-2. Compile and fix errors.
-3. `Scripts/Setup.py` (run in editor): create `/Game/Maps/Zombies_Arena` (empty + large NavMeshBoundsVolume + PlayerStart),
-   import `SourceAssets/Audio/*.wav` to `/Game/Audio`, find mannequin mesh/ABP and write paths into DefaultGame.ini.
-   Mannequin comes from the Third Person template content (Engine `Templates/TP_ThirdPerson`), copy it into Content.
-4. `Tools/gen_sfx.py` — standard library only (wave/math/random, no numpy; PC has Python 3.15) — synthesize placeholder WAVs (names referenced in code: SFX_*_Fire, SFX_Reload_Out/In,
-   SFX_Dry_Fire, SFX_Hit_Marker/Kill/Head, SFX_Impact, SFX_Knife_Swing/Hit, SFX_Player_Hurt/Down, SFX_Slide, SFX_Land,
-   SFX_Weapon_Raise, SFX_Low_Ammo, SFX_Zombie_Groan/Attack/Death, SFX_Round_Start/End, SFX_Purchase, SFX_PowerUp_*, SFX_Game_Over).
-5. Playtest loop: launch, screenshot, fix. Then art pass with CC0 assets (Poly Haven textures/HDRIs, Quaternius zombies,
-   Kenney), then critique rounds against reference footage.
+## Status
+Done: all classes compile on 5.8 with no warnings from our code; Setup.py and Tools/gen_sfx.py (38 sounds, stdlib only)
+work; the greybox "Outpost" arena plays end to end (rounds 1-9 checked; -ZMSelfTest passes every step).
+Content: `Content/Maps` and `Content/Audio` are committed. `Content/Characters` (template mannequin, ~126 MB) is
+gitignored and recreated by Setup.py from `E:\UE_5.8\Templates\TemplateResources\High\Characters`.
+Next, in order:
+1. Art pass with CC0 assets (Poly Haven textures/HDRIs, Quaternius zombies + anims, Kenney props). Zombies are currently
+   the tinted mannequin with ABP_Unarmed locomotion; MM_Attack_01 is the swing, played single-node (the ABP has no slot).
+2. Greybox weapons are cube models; the viewmodel needs real meshes/anims (ADS sight alignment derives from BodySize).
+3. Mystery box needs a "?" visual and beam; no barricades/windows yet (zombies rise from dirt patches).
+4. Critique round against reference footage once art is in.
 
 ## Conventions
 - Match existing style: tabs, `ZM`/`AZM` prefixes, short comments only where non-obvious.

@@ -2,6 +2,8 @@
 
     UnrealEditor.exe C:/Dev/EAFPS/EAFPS.uproject -ExecutePythonScript="C:/Dev/EAFPS/Scripts/Setup.py" -ZMSetupQuit
 
+Add -ZMReimportAudio after regenerating the WAVs with Tools/gen_sfx.py.
+
 Idempotent; safe to re-run. Steps:
   1. Copy the engine's template mannequin into /Game/Characters/Mannequins.
   2. Write the zombie mesh / anim blueprint paths into Config/DefaultGame.ini.
@@ -109,8 +111,12 @@ def import_audio():
         gen_sfx.build()
         wavs = sorted(f for f in os.listdir(AUDIO_SRC) if f.lower().endswith(".wav"))
 
+    # Only import what is missing so re-runs don't churn every .uasset; -ZMReimportAudio forces all.
+    force = "-ZMReimportAudio" in unreal.SystemLibrary.get_command_line()
     tasks = []
     for name in wavs:
+        if not force and unreal.EditorAssetLibrary.does_asset_exist("/Game/Audio/" + os.path.splitext(name)[0]):
+            continue
         task = unreal.AssetImportTask()
         task.filename = os.path.join(AUDIO_SRC, name)
         task.destination_path = "/Game/Audio"
@@ -118,9 +124,10 @@ def import_audio():
         task.replace_existing = True
         task.save = True
         tasks.append(task)
-    unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks(tasks)
+    if tasks:
+        unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks(tasks)
     imported = sum(1 for t in tasks if t.imported_object_paths)
-    log(f"Imported {imported}/{len(tasks)} sounds into /Game/Audio")
+    log(f"Imported {imported}/{len(tasks)} sounds into /Game/Audio ({len(wavs) - len(tasks)} already present)")
 
 
 # ---------------------------------------------------------------------------

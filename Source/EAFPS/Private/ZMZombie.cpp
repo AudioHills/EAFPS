@@ -266,11 +266,13 @@ void AZMZombie::UpdateAttack(float DeltaSeconds, AZMCharacter* Target)
 		{
 			AttackWindup = 0.f;
 			ZM::PlayWorldSound(this, "SFX_Zombie_Attack", GetActorLocation(), 1.f, FMath::FRandRange(0.9f, 1.1f));
-			UAnimInstance* Anim = bUsingSkeletalMesh ? GetMesh()->GetAnimInstance() : nullptr;
-			if (Anim && AttackAnim)
+			if (bUsingSkeletalMesh && AttackAnim)
 			{
-				// Needs a DefaultSlot in the anim graph; silently does nothing otherwise.
-				Anim->PlaySlotAnimationAsDynamicMontage(AttackAnim, TEXT("DefaultSlot"), 0.1f, 0.2f, 1.25f);
+				// Single-node playback works with any locomotion graph (no slot needed); the graph is restored after.
+				LocomotionClass = GetMesh()->GetAnimClass();
+				GetMesh()->PlayAnimation(AttackAnim, false);
+				GetMesh()->SetPlayRate(1.3f);
+				AttackAnimRemaining = AttackAnim->GetPlayLength() / 1.3f;
 			}
 		}
 		return;
@@ -316,6 +318,16 @@ void AZMZombie::Tick(float DeltaSeconds)
 
 	AZMCharacter* Target = Cast<AZMCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
 	UpdateAttack(DeltaSeconds, Target);
+
+	if (AttackAnimRemaining > 0.f)
+	{
+		AttackAnimRemaining -= DeltaSeconds;
+		if (AttackAnimRemaining <= 0.f && LocomotionClass)
+		{
+			GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+			GetMesh()->SetAnimInstanceClass(LocomotionClass);
+		}
+	}
 
 	if (!bUsingSkeletalMesh)
 	{

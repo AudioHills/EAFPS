@@ -7,6 +7,7 @@
 class AZMCharacter;
 class UStaticMeshComponent;
 class UAnimSequenceBase;
+class UAnimInstance;
 
 UENUM()
 enum class EZMZombieGait : uint8 { Walk, Run, Sprint };
@@ -39,6 +40,8 @@ protected:
 	UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> GreyboxParts;
 	UPROPERTY() TObjectPtr<UStaticMeshComponent> GreyboxHead;
 	UPROPERTY() TObjectPtr<UAnimSequenceBase> AttackAnim;
+	UPROPERTY() TSubclassOf<UAnimInstance> LocomotionClass;
+	float AttackAnimRemaining = 0.f;
 
 	float Health = 150.f;
 	bool bDead = false;

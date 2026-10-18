@@ -23,7 +23,7 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category = "Zombie")
 	TSoftClassPtr<UAnimInstance> ZombieAnimClass;
 
-	/** Played in the anim graph's DefaultSlot when a zombie swings. */
+	/** Played (single-node, then back to ZombieAnimClass) when a zombie swings. */
 	UPROPERTY(Config, EditAnywhere, Category = "Zombie")
 	TSoftObjectPtr<UAnimSequenceBase> ZombieAttackAnim;
 
